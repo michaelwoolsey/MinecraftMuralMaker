@@ -2,15 +2,15 @@
 
 To install dependencies, run `pip install -r requirements.txt`
 
-To use MMM, put an image called `input.png` in the working directory, or pass in a path to an image with the -i argument
+To use MMM, put an image called `input.png` in the working directory, or pass in a path to an image with the `-i` argument
 
-Optionally you can define the height of the mural in blocks with the optional argument -h `integer`
+Optionally you can define the height of the mural in blocks with the optional argument `-h integer`
 > NOTE: if you are working with large images, I would advise using this argument as otherwise it will be a 1 to 1 conversion from pixel to block, which will take a long time!
 
--d will dither the result, which may make photographs look more realistic
+`-d` will dither the result, which may make photographs look more realistic
   
 Usage: `mmm.py -r <"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all">`
-> When passing in more than 1 argument, you must surround them with \"\", (ex. -r \"shulker, ore\")
+> When passing in more than 1 argument, you must surround them with \"\", (ex. `-r \"shulker, ore\"`)
 
 What each option removes:
 * Creative: Bedrock
