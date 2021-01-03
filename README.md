@@ -23,4 +23,9 @@ What each option removes:
 * Ore: All Ore blocks and Ancient Debris
 * All: All of the above
 
-The result will appear in the `output` folder, which will contain the outputted image, the image with a grid on it for easier building reference, and a file listing all blocks needed to build
+The results will appear in the `output` folder, which will contain the outputted image, the image with a grid on it for easier building reference, and a file listing all blocks needed to build
+
+## Exaples!
+![before](https://i.imgur.com/mUTdpNR.png)
+![after](https://i.imgur.com/yH3UrZi.png)
+![grid](https://i.imgur.com/1FQrixf.png)
