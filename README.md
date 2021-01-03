@@ -10,7 +10,7 @@ Optionally you can define the height of the mural in blocks with the optional ar
 `-d` will dither the result, which may make photographs look more realistic
   
 Usage: `mmm.py -r <"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all">`
-> When passing in more than 1 argument, you must surround them with \"\", (ex. `-r \"shulker, ore\"`)
+> When passing in more than 1 argument, you must surround them with \"\", (ex. `-r "shulker, ore"`)
 
 What each option removes:
 * Creative: Bedrock
