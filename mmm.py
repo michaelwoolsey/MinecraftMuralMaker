@@ -61,10 +61,11 @@ def remove_crafting_blocks(name):
 	return True
 
 
-def remove_hard_blocks(name):
+def remove_expensive_blocks(name):
 	if "debris" in name or \
 			"netherite" in name or \
 			"diamond_b" in name or \
+			"gilded_blackstone" in name or \
 			"emerald_b" in name:
 		return False
 	return True
@@ -170,21 +171,23 @@ if __name__ == '__main__':
 	# remove ugly blocks (ex. target block, bookshelf, tnt)
 	# remove glazed terracotta
 	# remove shulker boxes
-	# remove hard to get blocks (ex. netherite block, debris, diamond block)
+	# remove expensive blocks (ex. netherite block, debris, diamond block)
 	# remove crafting blocks (ex. furnaces)
 	# remove glowing blocks (ex. glowstone)
 	# remove creative exclusive blocks (ex. bedrock)
 	block_removals = 0b0000000000
 	# block_removals = 0b1111111111
 
-	test_img = Image.new(mode="RGB", size=(LEN*16, 32), color=(255, 255, 255))
 	valid_blocks = []
 	input_filepath = None
+	dither = False
+
+	test_img = Image.new(mode="RGB", size=(LEN*16, 32), color=(255, 255, 255))
 
 	try:
-		options, args = getopt.getopt(sys.argv[1:], "h:i:r:", ["help", "remove="])
+		options, args = getopt.getopt(sys.argv[1:], "h:i:r:d", ["help", "remove="])
 	except getopt.GetoptError:
-		print("Usage: mmm.py -r <\"creative, glowing, crafting, hard, shulker, glazed, ugly, bee, sideways, ore, all\">")
+		print("Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all\">")
 		exit(0)
 
 	for opt, arg in options:
@@ -195,17 +198,18 @@ if __name__ == '__main__':
 				  " an image with the -i argument\nOptionally you can define the height of the mural in blocks "
 				  "with the optional argument -h <integer>\n\tNOTE: if you are working with large images, I would"
 				  " advise using this argument as otherwise it will be a 1 to 1 conversion from pixel to block, which"
-				  " will take a long time!\n\n"
-				  "Usage: mmm.py -r <\"creative, glowing, crafting, hard, shulker, glazed, ugly, bee, sideways, ore, all\">\n"
+				  " will take a long time!\n"
+				  "-d will dither the image, it may make the result look better, or it might make it worse!\n\n"
+				  "Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all\">\n"
 				  "When passing in more than 1 argument, you must surround them with \"\", (ex. -r \"shulker, ore\")\n"
 				  "What each option removes:\n"
 				  "\tCreative: Bedrock\n"
 				  "\tGlowing: Glowstone, Jack o' Lantern, Shroomlite\n"
 				  "\tCrafting: Crafting Table, Furnace, Smoker, Blast Furnace, Smithing Table, Loom, Fletching Table, Dropper, Dispenser, Barrel\n"
-				  "\tHard: Ancient Debris, Netherite Block, Diamond Block, Emerald Block\n"
+				  "\tExpensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone\n"
 				  "\tShulker: Shulker Boxes\n"
 				  "\tGlazed: Glazed Terracotta\n"
-				  "\tUgly: Bookshelf, TNT, Quartz ore, Pistons, Target Block, Carved Pumpkin\n"
+				  "\tUgly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin\n"
 				  "\tBee: Beehives, Bee Nest, Honey Block\n"
 				  "\tSideways: Tops of all Logs and top of Piston\n"
 				  "\tOre: All Ore blocks and Ancient Debris\n"
@@ -219,7 +223,7 @@ if __name__ == '__main__':
 				block_removals |= 0b1 << 1
 			if "crafting" in arg:
 				block_removals |= 0b1 << 2
-			if "hard" in arg:
+			if "expensive" in arg:
 				block_removals |= 0b1 << 3
 			if "shulker" in arg:
 				block_removals |= 0b1 << 4
@@ -240,9 +244,10 @@ if __name__ == '__main__':
 				HEIGHT = int(arg)
 			except TypeError:
 				print("Invalid height entered, using image height\n")
-
 		elif opt == "-i":
 			input_filepath = arg
+		elif opt == "-d":
+			dither = True
 	try:
 		if input_filepath is not None:
 			input_img = Image.open(input_filepath)
@@ -263,7 +268,7 @@ if __name__ == '__main__':
 						((block_removals & (0b1 << 0)) == 0 or (remove_noncreative_blocks(filepath))) and \
 						((block_removals & (0b1 << 1)) == 0 or (remove_glowing_blocks(filepath))) and \
 						((block_removals & (0b1 << 2)) == 0 or (remove_crafting_blocks(filepath))) and \
-						((block_removals & (0b1 << 3)) == 0 or (remove_hard_blocks(filepath))) and \
+						((block_removals & (0b1 << 3)) == 0 or (remove_expensive_blocks(filepath))) and \
 						((block_removals & (0b1 << 4)) == 0 or (remove_shulker_blocks(filepath))) and \
 						((block_removals & (0b1 << 5)) == 0 or (remove_glazed_blocks(filepath))) and \
 						((block_removals & (0b1 << 6)) == 0 or (remove_ugly_blocks(filepath))) and \
@@ -316,7 +321,7 @@ if __name__ == '__main__':
 	input_img = input_img.convert("RGB")
 	palimage = Image.new('P', (1, 1))
 	palimage.putpalette(palettedata)
-	newimage = quantizetopalette(input_img, palimage, dither=False)
+	newimage = quantizetopalette(input_img, palimage, dither=dither)
 	print("one Quantizing         ", end='\r')
 
 	newimage = newimage.convert("RGB").convert("RGBA")
@@ -426,3 +431,5 @@ if __name__ == '__main__':
 
 	print("Complete! You can find the resulting images and block counts in the output directory")
 	exit()
+
+	# TODO: add dithering option
