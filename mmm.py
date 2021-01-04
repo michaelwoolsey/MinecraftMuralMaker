@@ -116,15 +116,14 @@ def remove_ore_blocks(name):
 	return True
 
 
-
 def is_valid_block_from_image(image):
 	return image.height == image.width == 16
 
 
 def get_avg_colour(image):
-	return (round(np.mean(image.getdata(band=0))),
-			round(np.mean(image.getdata(band=1))),
-			round(np.mean(image.getdata(band=2))))
+	return (int(round(np.mean(image.getdata(band=0)))),
+		int(round(np.mean(image.getdata(band=1)))),
+		int(round(np.mean(image.getdata(band=2)))))
 
 
 #  https://stackoverflow.com/questions/29433243/convert-image-to-specific-palette-using-pil-without-dithering <3
