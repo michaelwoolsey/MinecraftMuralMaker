@@ -10,7 +10,7 @@ This assumes you already have downloaded some version of Python (preferably >=3.
 
 To install, run `git clone https://github.com/michaelwoolsey/MinecraftMuralMaker` in whatever folder you would like to install the project into, then run `cd MinecraftMuralMaker`
 
-To install dependencies, run `pip install -r requirements.txt`
+To install dependencies, run `pip install -r requirements.txt` (you may choose to run `python -m venv .` before this command)
 
 ## Usage
 
@@ -31,7 +31,7 @@ The program will not use any invalid or transparent blocks, (ex. chests, glass),
 * Expensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone, Amethyst block, Calcite, Lodestone, Rooted dirt
 * Shulker: Shulker Boxes
 * Glazed: Glazed Terracotta
-* Ugly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin, Copper ore
+* Ugly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin, Copper ore, Muddy Mangrove Roots
 * Bee: Beehives, Bee Nest, Honey Block
 * Sideways: Tops of all Logs and top of Piston
 * Ore: All Ore blocks and Ancient Debris

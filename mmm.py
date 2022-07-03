@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 import sys
 import getopt
+import random
 
 
 def has_transparency(image):
@@ -95,6 +96,7 @@ def remove_ugly_blocks(name):
 			"piston" in name or \
 			"carved" in name or \
 			"gilded_blackstone" in name or \
+			"muddy_mangrove_roots" in name or \
 			"copper_ore" in name:
 		return False
 	return True
@@ -124,7 +126,7 @@ def remove_ore_blocks(name):
 
 def remove_copper_blocks(name):
 	if "copper" in name:
-		return "ore" in name  # copper ore allowed, all others not
+		return "ore" in name or "raw" in name  # copper ore and raw copper block allowed, all others not
 	return True
 
 
@@ -222,7 +224,7 @@ if __name__ == '__main__':
 				  "\tExpensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone, Lodestone, Rooted Dirt, Amethyst Block, Calcite\n"
 				  "\tShulker: Shulker Boxes\n"
 				  "\tGlazed: Glazed Terracotta\n"
-				  "\tUgly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin\n"
+				  "\tUgly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin, Muddy Mangrove Roots\n"
 				  "\tBee: Beehives, Bee Nest, Honey Block\n"
 				  "\tSideways: Tops of all Logs and top of Piston\n"
 				  "\tOre: All Ore blocks and Ancient Debris\n"
@@ -310,6 +312,25 @@ if __name__ == '__main__':
 		palettedata.append(avg_col[1])
 		palettedata.append(avg_col[2])
 
+	# there is an infuriating problem with PIL that i am not in the place mentally to solve for now, but
+	# the palettedata can only contain 256 colours at the most, and currently we have 297 when using all blocks,
+	# so the workaround for now is to remove random blocks until we get 256
+	if len(palettedata)//3 > 256:  
+		num_to_remove = len(palettedata)//3 - 256
+		print(f'NOTE: Due to package limitations, {num_to_remove} blocks have been removed from the palette for the program to work\n')
+		to_remove = random.sample(range(1, 256), num_to_remove)
+		to_remove = [elm * 3 for _, elm in enumerate(to_remove)]
+		to_remove.sort()
+		to_remove = [elm - i*3 for i, elm in enumerate(to_remove)]
+		for i in to_remove:
+			del palettedata[i]
+			del palettedata[i]
+			del palettedata[i]
+
+
+
+	# print('\n\n\n')
+
 	print("Done Texture Parsing       ", end='\r')
 
 	if HEIGHT is not None:
@@ -337,7 +358,7 @@ if __name__ == '__main__':
 
 	input_img = input_img.convert("RGB")
 	palimage = Image.new('P', (1, 1))
-	palimage.putpalette(palettedata)
+	palimage.putpalette(list(palettedata))
 	newimage = quantizetopalette(input_img, palimage, dither=dither)
 	print("one Quantizing         ", end='\r')
 
