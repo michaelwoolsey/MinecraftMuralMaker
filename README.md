@@ -40,7 +40,7 @@ The program will not use any invalid or transparent blocks, (ex. chests, glass),
 
 The results will appear in the `output` folder, which will contain the outputted image, the image with a grid on it for easier building reference, and a file listing all blocks needed to build
 
-## Exaples!
+## Examples!
 ![before](https://i.imgur.com/mUTdpNR.png)
 ![after](https://i.imgur.com/yH3UrZi.png)
 ![grid](https://i.imgur.com/1FQrixf.png)
