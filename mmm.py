@@ -66,6 +66,10 @@ def remove_expensive_blocks(name):
 			"netherite" in name or \
 			"diamond_b" in name or \
 			"gilded_blackstone" in name or \
+			"lodestone" in name or \
+			"rooted_dirt" in name or \
+			"calcite" in name or \
+			"amethyst" in name or \
 			"emerald_b" in name:
 		return False
 	return True
@@ -89,7 +93,9 @@ def remove_ugly_blocks(name):
 			"z_ore" in name or \
 			"target" in name or \
 			"piston" in name or \
-			"carved" in name:
+			"carved" in name or \
+			"gilded_blackstone" in name or \
+			"copper_ore" in name:
 		return False
 	return True
 
@@ -114,6 +120,13 @@ def remove_ore_blocks(name):
 		"debris" in name:
 		return False
 	return True
+
+
+def remove_copper_blocks(name):
+	if "copper" in name:
+		return "ore" in name  # copper ore allowed, all others not
+	return True
+
 
 
 def is_valid_block_from_image(image):
@@ -164,6 +177,7 @@ if __name__ == '__main__':
 	HEIGHT = None
 
 	# 		bits from left to right:
+	# remove copper blocks (only the ones that weather)
 	# remove ore blocks
 	# remove sideways facing logs
 	# remove bee blocks (ex. beehives, honey blocks)
@@ -174,8 +188,8 @@ if __name__ == '__main__':
 	# remove crafting blocks (ex. furnaces)
 	# remove glowing blocks (ex. glowstone)
 	# remove creative exclusive blocks (ex. bedrock)
-	block_removals = 0b0000000000
-	# block_removals = 0b1111111111
+	block_removals = 0b00000000000
+	# block_removals = 0b11111111111
 
 	valid_blocks = []
 	input_filepath = None
@@ -186,7 +200,7 @@ if __name__ == '__main__':
 	try:
 		options, args = getopt.getopt(sys.argv[1:], "h:i:r:d", ["help", "remove="])
 	except getopt.GetoptError:
-		print("Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all\">")
+		print("Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, copper, all\">")
 		exit(0)
 
 	for opt, arg in options:
@@ -205,13 +219,14 @@ if __name__ == '__main__':
 				  "\tCreative: Bedrock\n"
 				  "\tGlowing: Glowstone, Jack o' Lantern, Shroomlite\n"
 				  "\tCrafting: Crafting Table, Furnace, Smoker, Blast Furnace, Smithing Table, Loom, Fletching Table, Dropper, Dispenser, Barrel\n"
-				  "\tExpensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone\n"
+				  "\tExpensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone, Lodestone, Rooted Dirt, Amethyst Block, Calcite\n"
 				  "\tShulker: Shulker Boxes\n"
 				  "\tGlazed: Glazed Terracotta\n"
 				  "\tUgly: Bookshelf, TNT, Quartz Ore, Pistons, Target Block, Carved Pumpkin\n"
 				  "\tBee: Beehives, Bee Nest, Honey Block\n"
 				  "\tSideways: Tops of all Logs and top of Piston\n"
 				  "\tOre: All Ore blocks and Ancient Debris\n"
+				  "\tCopper: All Copper blocks that can become weathered\n"
 				  "\tAll: All of the above")
 			exit(1)
 		elif opt == "-r":
@@ -236,6 +251,8 @@ if __name__ == '__main__':
 				block_removals |= 0b1 << 8
 			if "ore" in arg:
 				block_removals |= 0b1 << 9
+			if "copper" in arg:
+				block_removals |= 0b1 << 10
 			if "all" in arg:
 				block_removals = -1
 		elif opt == "-h":
@@ -273,7 +290,8 @@ if __name__ == '__main__':
 						((block_removals & (0b1 << 6)) == 0 or (remove_ugly_blocks(filepath))) and \
 						((block_removals & (0b1 << 7)) == 0 or (remove_bee_blocks(filepath))) and \
 						((block_removals & (0b1 << 8)) == 0 or (remove_sidewaysfacing_blocks(filepath))) and \
-						((block_removals & (0b1 << 9)) == 0 or (remove_ore_blocks(filepath))):
+						((block_removals & (0b1 << 9)) == 0 or (remove_ore_blocks(filepath))) and \
+						((block_removals & (0b1 << 10)) == 0 or (remove_copper_blocks(filepath))):
 					valid_blocks.append(filepath)
 				texture.close()  # memory management :)
 	valid_blocks.sort()
