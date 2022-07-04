@@ -26,7 +26,7 @@ Usage: `mmm.py -r <"creative, glowing, crafting, expensive, shulker, glazed, ugl
 
 The program will not use any invalid or transparent blocks, (ex. chests, glass), but you can choose to remove other blocks:
 * Creative: Bedrock
-* Glowing: Glowstone, Jack o' Lantern, Shroomlite
+* Glowing: Glowstone, Jack o' Lantern, Shroomlite, Crying Obsidian
 * Crafting: Crafting Table, Furnace, Smoker, Blast Furnace, Smithing Table, Loom, Fletching Table, Dropper, Dispenser, Barrel
 * Expensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone, Amethyst block, Calcite, Lodestone, Rooted dirt
 * Shulker: Shulker Boxes
