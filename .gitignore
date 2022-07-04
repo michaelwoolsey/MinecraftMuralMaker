@@ -1,0 +1,7 @@
+# ignore new_utils
+new_utils
+pyvenv.cfg
+output
+Scripts
+Lib
+outputs

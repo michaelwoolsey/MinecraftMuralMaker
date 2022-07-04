@@ -43,6 +43,7 @@ def remove_noncreative_blocks(name):
 def remove_glowing_blocks(name):
 	if "glowstone" in name or \
 			"jack" in name or \
+			"crying_obsid" in name or \
 			"shrooml" in name:
 		return False
 	return True
@@ -97,6 +98,7 @@ def remove_ugly_blocks(name):
 			"carved" in name or \
 			"gilded_blackstone" in name or \
 			"muddy_mangrove_roots" in name or \
+			"birch_log" in name or \
 			"copper_ore" in name:
 		return False
 	return True
@@ -219,7 +221,7 @@ if __name__ == '__main__':
 				  "When passing in more than 1 argument, you must surround them with \"\", (ex. -r \"shulker, ore\")\n"
 				  "What each option removes:\n"
 				  "\tCreative: Bedrock\n"
-				  "\tGlowing: Glowstone, Jack o' Lantern, Shroomlite\n"
+				  "\tGlowing: Glowstone, Jack o' Lantern, Shroomlite, Crying Obsidian\n"
 				  "\tCrafting: Crafting Table, Furnace, Smoker, Blast Furnace, Smithing Table, Loom, Fletching Table, Dropper, Dispenser, Barrel\n"
 				  "\tExpensive: Ancient Debris, Netherite Block, Diamond Block, Emerald Block, Gilded Blackstone, Lodestone, Rooted Dirt, Amethyst Block, Calcite\n"
 				  "\tShulker: Shulker Boxes\n"
@@ -317,7 +319,7 @@ if __name__ == '__main__':
 	# so the workaround for now is to remove random blocks until we get 256
 	if len(palettedata)//3 > 256:  
 		num_to_remove = len(palettedata)//3 - 256
-		print(f'NOTE: Due to package limitations, {num_to_remove} blocks have been removed from the palette for the program to work\n')
+		print(f'NOTE: Due to package limitations, {num_to_remove} random blocks have been removed from the palette for the program to work\n')
 		to_remove = random.sample(range(1, 256), num_to_remove)
 		to_remove = [elm * 3 for _, elm in enumerate(to_remove)]
 		to_remove.sort()
@@ -457,6 +459,8 @@ if __name__ == '__main__':
 			block_counts.append((item["name"], item["count"]))
 	block_counts.sort(key=lambda tup: tup[1], reverse=True)
 	f = open("output" + os.sep + "blocks_needed.txt", "w")
+	f.write(f'WIDTH: {newimage.width}, HEIGHT: {newimage.height}, UNIQUE BLOCKS: {len(block_counts)}\n')
+	f.write(f'(Note: If your image is transparent, the width may not be fully accurate since transparent spaces to the side of the mural will be counted for the number)\n\n')
 	for i, bc in enumerate(block_counts):
 		progress_bar(i, len(block_counts), strprg="Counting blocks")
 		if bc[1] > 63:
@@ -466,6 +470,7 @@ if __name__ == '__main__':
 				f.write(bc[0] + ': ' + str(bc[1]//64) + ' stacks + ' + str(bc[1] % 64) + '\n')
 		else:
 			f.write(bc[0] + ': ' + str(bc[1]) + '\n')
+	
 
 	print("Complete! You can find the resulting images and block counts in the output directory")
 	exit()
