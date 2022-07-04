@@ -1,3 +1,4 @@
+from math import ceil
 import os
 from PIL import Image
 import numpy as np
@@ -459,19 +460,28 @@ if __name__ == '__main__':
 			block_counts.append((item["name"], item["count"]))
 	block_counts.sort(key=lambda tup: tup[1], reverse=True)
 	f = open("output" + os.sep + "blocks_needed.txt", "w")
-	f.write(f'WIDTH: {newimage.width}, HEIGHT: {newimage.height}, UNIQUE BLOCKS: {len(block_counts)}\n')
-	f.write(f'(Note: If your image is transparent, the width may not be fully accurate since transparent spaces to the side of the mural will be counted for the number)\n\n')
+	
+	total_stacks = 0
+	total_blocks = 0
+	final_string = ""
 	for i, bc in enumerate(block_counts):
 		progress_bar(i, len(block_counts), strprg="Counting blocks")
 		if bc[1] > 63:
 			if bc[1] % 64 == 0:
-				f.write(bc[0] + ': ' + str(bc[1] // 64) + ' stacks\n')
+				final_string += bc[0] + ': ' + str(bc[1] // 64) + ' stacks\n'
+				total_stacks += bc[1] // 64
 			else:
-				f.write(bc[0] + ': ' + str(bc[1]//64) + ' stacks + ' + str(bc[1] % 64) + '\n')
+				final_string += bc[0] + ': ' + str(bc[1]//64) + ' stacks + ' + str(bc[1] % 64) + '\n'
+				total_stacks += (bc[1] // 64) + 1
 		else:
-			f.write(bc[0] + ': ' + str(bc[1]) + '\n')
+			final_string += bc[0] + ': ' + str(bc[1]) + '\n'
+			total_stacks += 1
+		total_blocks += bc[1]
 	
-
+	f.write(f'WIDTH: {newimage.width}, HEIGHT: {newimage.height}, UNIQUE BLOCKS: {len(block_counts)}, TOTAL BLOCKS: {total_blocks}, TOTAL STACKS: {total_stacks}, TOTAL SHULKERS NEEDED: {ceil(total_stacks / 30)}\n')
+	f.write(f'(Note: If your image is transparent, the width may not be fully accurate since transparent spaces to the side of the mural will be counted for the number)\n\n')
+	f.write(final_string)
+	
 	print("Complete! You can find the resulting images and block counts in the output directory")
 	exit()
 
