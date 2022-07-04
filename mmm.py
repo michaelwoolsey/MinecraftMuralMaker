@@ -363,7 +363,7 @@ if __name__ == '__main__':
 	palimage = Image.new('P', (1, 1))
 	palimage.putpalette(list(palettedata))
 	newimage = quantizetopalette(input_img, palimage, dither=dither)
-	print("one Quantizing         ", end='\r')
+	print("Quantizing            ", end='\r')
 
 	newimage = newimage.convert("RGB").convert("RGBA")
 	if transparency_img is not None:
@@ -391,22 +391,38 @@ if __name__ == '__main__':
 		print("something bad has occurred", end="\r")
 
 	final_img = Image.new("RGBA", (newimage.width * 16, newimage.height * 16), (0, 0, 0, 0))
+
+	
 	for y in range(newimage.height): #use getcolors ?
 		progress_bar(y, newimage.height, strprg="Making into blocks")
 		for x in range(newimage.width):
 			px = newimage.getpixel((x, y))
-			str2 = get_col_name(px)
+			block_name = get_col_name(px)
 			increment_block_count(px)
-			if str2 == "TSP":
-				pass
-			else:
-				# if str2 == "ERROR":
-				# 	# newimage.putpixel((x, y), (249, 254, 254))
-				# 	str2 = "snow"
-				txt = Image.open("blocks" + os.sep + str2 + ".png")
+			if not block_name == "TSP":
+				txt = Image.open("blocks" + os.sep + block_name + ".png")
 				final_img.paste(txt, (x*16, y*16))
 	progress_bar(newimage.height, newimage.height, strprg="Making into blocks")
-	# newimage.show()
+
+	block_str = ""
+	block_sep = " | "
+	longest_block_len = max([len(itm['name']) for itm in block])
+	for y in range(newimage.height):
+		progress_bar(y, newimage.height, strprg="Counting blocks")
+		block_str += str(newimage.height - y + 1).ljust(len(str(newimage.height)) + 1, " ")
+		for x in range(newimage.width):
+			px = newimage.getpixel((x, y))
+			block_name = get_col_name(px)
+			if block_name == "TSP":
+				block_str += ' ' * longest_block_len + block_sep
+			else:
+				block_str += block_name.center(longest_block_len, " ") + block_sep
+		block_str = block_str[:-len(block_sep)] + "\n"
+	block_str += " " * (len(str(newimage.height)) + 1)
+	for x in range(newimage.width):
+		block_str += str(x + 1).center(longest_block_len, " ") + " " * len(block_sep)
+	
+	progress_bar(newimage.height, newimage.height, strprg="Counting blocks")
 
 	# if transparency_img is not None:
 	# 	transparency_img2 = transparency_img.resize((transparency_img.size[0] * 16, transparency_img.size[1] * 16))
@@ -481,6 +497,7 @@ if __name__ == '__main__':
 	f.write(f'WIDTH: {newimage.width}, HEIGHT: {newimage.height}, UNIQUE BLOCKS: {len(block_counts)}, TOTAL BLOCKS: {total_blocks}, TOTAL STACKS: {total_stacks}, TOTAL SHULKERS NEEDED: {ceil(total_stacks / 30)}\n')
 	f.write(f'(Note: If your image is transparent, the width may not be fully accurate since transparent spaces to the side of the mural will be counted for the number)\n\n')
 	f.write(final_string)
+	f.write(f'\n\n{block_str}')
 	
 	print("Complete! You can find the resulting images and block counts in the output directory")
 	exit()
