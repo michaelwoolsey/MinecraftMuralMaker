@@ -36,7 +36,7 @@ def is_valid_block_from_name(name):
 
 
 def remove_noncreative_blocks(name):
-	if "bedrock" in name:
+	if "bedrock" in name or 'deepslate_coal_ore' in name:
 		return False
 	return True
 
@@ -73,7 +73,7 @@ def remove_expensive_blocks(name):
 			"rooted_dirt" in name or \
 			"calcite" in name or \
 			"amethyst" in name or \
-			"emerald_b" in name:
+			"emerald" in name:
 		return False
 	return True
 
@@ -100,6 +100,7 @@ def remove_ugly_blocks(name):
 			"gilded_blackstone" in name or \
 			"muddy_mangrove_roots" in name or \
 			"birch_log" in name or \
+			"redstone_ore" in name or \
 			"copper_ore" in name:
 		return False
 	return True
@@ -199,17 +200,18 @@ if __name__ == '__main__':
 	valid_blocks = []
 	input_filepath = None
 	dither = False
+	x_given = False
+	y_given = False
 
 	test_img = Image.new(mode="RGB", size=(LEN*16, 32), color=(255, 255, 255))
 
 	try:
-		options, args = getopt.getopt(sys.argv[1:], "h:i:r:d", ["help", "remove="])
+		options, args = getopt.getopt(sys.argv[1:], "h:i:r:d:x:y:", ["help", "remove="])
 	except getopt.GetoptError:
 		print("Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, copper, all\">")
 		exit(0)
 
 	for opt, arg in options:
-
 		if opt == "--help":
 			print("\nWelcome to Minecraft Mural Maker! A tool made specifically for building murals in survival Minecraft\n\n"
 				  "To use MMM, put an image called \'input.png\' in the working directory, or pass in a path to"
@@ -217,6 +219,10 @@ if __name__ == '__main__':
 				  "with the optional argument -h <integer>\n\tNOTE: if you are working with large images, I would"
 				  " advise using this argument as otherwise it will be a 1 to 1 conversion from pixel to block, which"
 				  " will take a long time!\n"
+				  "For the building guide text file, you can choose to define a starting coordinate for the bottom left corner block, "
+				  "and this can be done through the -x <integer representing the bottom left block's x or z coordinate> -y <integer rerpreseting the bottom left block's y coordinate> arguments\n"
+				  "NOTE: I recommend measuring this by physically placing a block down in your world where you think the bottom left should be (even if the block in the mural will be transparent), "
+				  "and then using the 'Targeted Block' values on the right side of the F3 screen to define that point\n"
 				  "-d will dither the image, it may make the result look better, or it might make it worse!\n\n"
 				  "Usage: mmm.py -r <\"creative, glowing, crafting, expensive, shulker, glazed, ugly, bee, sideways, ore, all\">\n"
 				  "When passing in more than 1 argument, you must surround them with \"\", (ex. -r \"shulker, ore\")\n"
@@ -269,6 +275,12 @@ if __name__ == '__main__':
 			input_filepath = arg
 		elif opt == "-d":
 			dither = True
+		elif opt == "-x":
+			x_coord_val = int(arg)
+			x_given = True
+		elif opt == "-y":
+			y_coord_val = int(arg)
+			y_given = True
 	try:
 		if input_filepath is not None:
 			input_img = Image.open(input_filepath)
@@ -405,22 +417,39 @@ if __name__ == '__main__':
 	progress_bar(newimage.height, newimage.height, strprg="Making into blocks")
 
 	block_str = ""
+	block_str_csv = ""
 	block_sep = " | "
-	longest_block_len = max([len(itm['name']) for itm in block])
+	block_sep_csv = ", "
+	# print(f'\n\n{blocks}')
+	# print(list(itm for itm in blocks))
+	longest_block_len = max([len(itm['name']) for itm in blocks])
+	y_val = newimage.height if not y_given else y_coord_val + newimage.height -1
+	x_val_start = 1 if not x_given else x_coord_val
+
 	for y in range(newimage.height):
 		progress_bar(y, newimage.height, strprg="Counting blocks")
-		block_str += str(newimage.height - y + 1).ljust(len(str(newimage.height)) + 1, " ")
+		block_str += str(y_val).ljust(len(str(newimage.height + newimage.height -1)) + 1, " ")
+		block_str_csv += str(y_val) + block_sep_csv
 		for x in range(newimage.width):
 			px = newimage.getpixel((x, y))
 			block_name = get_col_name(px)
 			if block_name == "TSP":
 				block_str += ' ' * longest_block_len + block_sep
+				block_str_csv += block_sep_csv
 			else:
 				block_str += block_name.center(longest_block_len, " ") + block_sep
+				block_str_csv += block_name + block_sep_csv
 		block_str = block_str[:-len(block_sep)] + "\n"
+		block_str_csv += '\n'
+		y_val -= 1
+
 	block_str += " " * (len(str(newimage.height)) + 1)
+	xv = x_val_start
+	x_coord_str = "index, "
 	for x in range(newimage.width):
-		block_str += str(x + 1).center(longest_block_len, " ") + " " * len(block_sep)
+		block_str += str(xv).center(longest_block_len, " ") + " " * len(block_sep)
+		x_coord_str += str(xv) + block_sep_csv
+		xv += 1
 	
 	progress_bar(newimage.height, newimage.height, strprg="Counting blocks")
 
@@ -497,9 +526,13 @@ if __name__ == '__main__':
 	f.write(f'WIDTH: {newimage.width}, HEIGHT: {newimage.height}, UNIQUE BLOCKS: {len(block_counts)}, TOTAL BLOCKS: {total_blocks}, TOTAL STACKS: {total_stacks}, TOTAL SHULKERS NEEDED: {ceil(total_stacks / 30)}\n')
 	f.write(f'(Note: If your image is transparent, the width may not be fully accurate since transparent spaces to the side of the mural will be counted for the number)\n\n')
 	f.write(final_string)
-	f.write(f'\n\n{block_str}')
+	f.write(f'\n\nIn order to see the following block guide, you will have to open this file in a text editor where the lines don\'t wrap (like Visual Studio Code)\n\n{block_str}')
 	
 	print("Complete! You can find the resulting images and block counts in the output directory")
-	exit()
+	# exit()
+	f.close()
 
-	# TODO: add dithering option
+	fcsv = open(f'output{os.sep}building_guide.csv', 'w')
+	fcsv.write(x_coord_str+'\n'+block_str_csv)
+	fcsv.close()
+
